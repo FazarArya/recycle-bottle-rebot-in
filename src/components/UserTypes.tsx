@@ -1,6 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Users, Building2, Coins, LineChart, Recycle, MapPin } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const UserTypes = () => {
   return (
@@ -57,8 +58,10 @@ const UserTypes = () => {
                   </div>
                 </div>
               </div>
-              <Button className="w-full" size="lg">
-                Daftar Sebagai Teman
+              <Button asChild className="w-full" size="lg">
+                <Link to="/teman/dashboard">
+                  Daftar Sebagai Teman
+                </Link>
               </Button>
             </CardContent>
           </Card>
@@ -103,8 +106,10 @@ const UserTypes = () => {
                   </div>
                 </div>
               </div>
-              <Button className="w-full" variant="secondary" size="lg">
-                Daftar Sebagai Mitra
+              <Button asChild className="w-full" variant="secondary" size="lg">
+                <Link to="/mitra/dashboard">
+                  Daftar Sebagai Mitra
+                </Link>
               </Button>
             </CardContent>
           </Card>

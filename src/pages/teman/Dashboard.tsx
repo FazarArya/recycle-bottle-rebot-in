@@ -1,0 +1,160 @@
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Coins, TrendingUp, Recycle, Award, History, DollarSign } from "lucide-react";
+import { Link } from "react-router-dom";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+
+const TemanDashboard = () => {
+  // Mock data - nanti akan diganti dengan data real dari backend
+  const userData = {
+    name: "Ahmad Wijaya",
+    greenCoin: 12500,
+    bottlesRecycled: 145,
+    co2Saved: 72.5,
+    treesEquivalent: 3
+  };
+
+  return (
+    <div className="min-h-screen bg-background">
+      <Navbar />
+      <main className="container mx-auto px-4 py-8 mt-20">
+        <div className="mb-8">
+          <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-2">
+            Dashboard Teman
+          </h1>
+          <p className="text-muted-foreground">
+            Selamat datang, {userData.name}! 🌱
+          </p>
+        </div>
+
+        {/* GreenCoin Card */}
+        <Card className="mb-8 border-2 border-primary bg-gradient-to-br from-primary/10 to-secondary/10">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="text-2xl">GreenCoin Anda</CardTitle>
+                <CardDescription>Saldo koin yang dapat ditukarkan</CardDescription>
+              </div>
+              <div className="w-16 h-16 rounded-full bg-primary flex items-center justify-center">
+                <Coins className="w-8 h-8 text-primary-foreground" />
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="text-4xl font-bold text-primary mb-4">
+              {userData.greenCoin.toLocaleString('id-ID')} GC
+            </div>
+            <div className="flex gap-3">
+              <Button asChild className="flex-1">
+                <Link to="/teman/pencairan">
+                  <DollarSign className="w-4 h-4 mr-2" />
+                  Cairkan Koin
+                </Link>
+              </Button>
+              <Button asChild variant="outline" className="flex-1">
+                <Link to="/teman/riwayat">
+                  <History className="w-4 h-4 mr-2" />
+                  Lihat Riwayat
+                </Link>
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Jejak Hijau Section */}
+        <div className="mb-8">
+          <h2 className="text-2xl font-bold text-foreground mb-4 flex items-center gap-2">
+            <Award className="w-6 h-6 text-primary" />
+            Jejak Hijau Anda
+          </h2>
+          <div className="grid md:grid-cols-3 gap-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-lg">
+                  <Recycle className="w-5 h-5 text-primary" />
+                  Botol Didaur Ulang
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold text-foreground">
+                  {userData.bottlesRecycled}
+                </div>
+                <p className="text-sm text-muted-foreground mt-1">
+                  botol berhasil didaur ulang
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-lg">
+                  <TrendingUp className="w-5 h-5 text-secondary" />
+                  CO₂ Dikurangi
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold text-foreground">
+                  {userData.co2Saved} kg
+                </div>
+                <p className="text-sm text-muted-foreground mt-1">
+                  emisi karbon dioksida
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-lg">
+                  <Award className="w-5 h-5 text-accent-foreground" />
+                  Setara Pohon
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold text-foreground">
+                  {userData.treesEquivalent}
+                </div>
+                <p className="text-sm text-muted-foreground mt-1">
+                  pohon yang diselamatkan
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+
+        {/* Quick Actions */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Aksi Cepat</CardTitle>
+            <CardDescription>Kelola akun dan aktivitas Anda</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid md:grid-cols-2 gap-4">
+              <Button asChild variant="outline" className="h-auto py-4 justify-start">
+                <Link to="/teman/riwayat">
+                  <History className="w-5 h-5 mr-3" />
+                  <div className="text-left">
+                    <div className="font-semibold">Riwayat Transaksi</div>
+                    <div className="text-xs text-muted-foreground">Lihat semua aktivitas Anda</div>
+                  </div>
+                </Link>
+              </Button>
+              <Button asChild variant="outline" className="h-auto py-4 justify-start">
+                <Link to="/teman/profil">
+                  <Award className="w-5 h-5 mr-3" />
+                  <div className="text-left">
+                    <div className="font-semibold">Profil Saya</div>
+                    <div className="text-xs text-muted-foreground">Edit informasi pribadi</div>
+                  </div>
+                </Link>
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </main>
+      <Footer />
+    </div>
+  );
+};
+
+export default TemanDashboard;

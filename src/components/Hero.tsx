@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Coins, Recycle } from "lucide-react";
+import { Link } from "react-router-dom";
 import heroImage from "@/assets/hero-image.jpg";
 
 const Hero = () => {
@@ -26,13 +27,17 @@ const Hero = () => {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 pt-4">
-              <Button size="lg" className="gap-2 text-base shadow-lg hover:shadow-xl transition-all">
-                Daftar Sebagai Teman
-                <ArrowRight className="w-5 h-5" />
+              <Button asChild size="lg" className="gap-2 text-base shadow-lg hover:shadow-xl transition-all">
+                <Link to="/teman/dashboard">
+                  Daftar Sebagai Teman
+                  <ArrowRight className="w-5 h-5" />
+                </Link>
               </Button>
-              <Button size="lg" variant="outline" className="gap-2 text-base">
-                <Coins className="w-5 h-5" />
-                Daftar Sebagai Mitra
+              <Button asChild size="lg" variant="outline" className="gap-2 text-base">
+                <Link to="/mitra/dashboard">
+                  <Coins className="w-5 h-5" />
+                  Daftar Sebagai Mitra
+                </Link>
               </Button>
             </div>
 
