@@ -14,16 +14,313 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      botol_types: {
+        Row: {
+          coin: number
+          created_at: string
+          id: string
+          kategori: string
+          kode_barcode: string
+          nama: string
+        }
+        Insert: {
+          coin: number
+          created_at?: string
+          id?: string
+          kategori: string
+          kode_barcode: string
+          nama: string
+        }
+        Update: {
+          coin?: number
+          created_at?: string
+          id?: string
+          kategori?: string
+          kode_barcode?: string
+          nama?: string
+        }
+        Relationships: []
+      }
+      machine_status_logs: {
+        Row: {
+          created_at: string
+          id: string
+          machine_id: string
+          pesan: string | null
+          status: string
+          waktu: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          machine_id: string
+          pesan?: string | null
+          status: string
+          waktu?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          machine_id?: string
+          pesan?: string | null
+          status?: string
+          waktu?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "machine_status_logs_machine_id_fkey"
+            columns: ["machine_id"]
+            isOneToOne: false
+            referencedRelation: "machines"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      machines: {
+        Row: {
+          created_at: string
+          id: string
+          koneksi: string
+          last_update: string
+          lokasi: string
+          mitra_id: string | null
+          slot_status: Json
+          status_kapasitas: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          koneksi?: string
+          last_update?: string
+          lokasi: string
+          mitra_id?: string | null
+          slot_status?: Json
+          status_kapasitas?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          koneksi?: string
+          last_update?: string
+          lokasi?: string
+          mitra_id?: string | null
+          slot_status?: Json
+          status_kapasitas?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "machines_mitra_id_fkey"
+            columns: ["mitra_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          nama: string
+          no_hp: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id: string
+          nama: string
+          no_hp?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          nama?: string
+          no_hp?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      transactions_botol: {
+        Row: {
+          created_at: string
+          data_botol: Json
+          id: string
+          machine_id: string | null
+          tanggal: string
+          total_coin: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          data_botol: Json
+          id?: string
+          machine_id?: string | null
+          tanggal?: string
+          total_coin: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          data_botol?: Json
+          id?: string
+          machine_id?: string | null
+          tanggal?: string
+          total_coin?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "transactions_botol_machine_id_fkey"
+            columns: ["machine_id"]
+            isOneToOne: false
+            referencedRelation: "machines"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "transactions_botol_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      transactions_coin: {
+        Row: {
+          biaya_layanan: number
+          created_at: string
+          id: string
+          jumlah_coin: number
+          status: string
+          timestamp: string
+          total_diterima: number
+          user_id: string
+        }
+        Insert: {
+          biaya_layanan?: number
+          created_at?: string
+          id?: string
+          jumlah_coin: number
+          status?: string
+          timestamp?: string
+          total_diterima: number
+          user_id: string
+        }
+        Update: {
+          biaya_layanan?: number
+          created_at?: string
+          id?: string
+          jumlah_coin?: number
+          status?: string
+          timestamp?: string
+          total_diterima?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "transactions_coin_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_roles_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      users: {
+        Row: {
+          id: string
+          saldo_coin: number
+          total_botol: number
+        }
+        Insert: {
+          id: string
+          saldo_coin?: number
+          total_botol?: number
+        }
+        Update: {
+          id?: string
+          saldo_coin?: number
+          total_botol?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "users_id_fkey"
+            columns: ["id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      verification_codes: {
+        Row: {
+          created_at: string
+          email: string
+          expires_at: string
+          kode_otp: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          expires_at: string
+          kode_otp: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          expires_at?: string
+          kode_otp?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "teman" | "mitra" | "admin"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +447,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["teman", "mitra", "admin"],
+    },
   },
 } as const

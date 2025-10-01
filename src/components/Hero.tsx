@@ -28,13 +28,13 @@ const Hero = () => {
             
             <div className="flex flex-col sm:flex-row gap-4 pt-4">
               <Button asChild size="lg" className="gap-2 text-base shadow-lg hover:shadow-xl transition-all">
-                <Link to="/teman/dashboard">
+                <Link to="/auth/teman">
                   Daftar Sebagai Teman
                   <ArrowRight className="w-5 h-5" />
                 </Link>
               </Button>
               <Button asChild size="lg" variant="outline" className="gap-2 text-base">
-                <Link to="/mitra/dashboard">
+                <Link to="/auth/mitra">
                   <Coins className="w-5 h-5" />
                   Daftar Sebagai Mitra
                 </Link>

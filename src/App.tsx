@@ -5,10 +5,15 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
+
+import TemanAuth from "./pages/auth/TemanAuth";
+import MitraAuth from "./pages/auth/MitraAuth";
+
 import TemanDashboard from "./pages/teman/Dashboard";
 import TemanRiwayat from "./pages/teman/Riwayat";
 import TemanPencairan from "./pages/teman/Pencairan";
 import TemanProfil from "./pages/teman/Profil";
+
 import MitraDashboard from "./pages/mitra/Dashboard";
 import MitraRiwayat from "./pages/mitra/Riwayat";
 import MitraPencairan from "./pages/mitra/Pencairan";
@@ -24,6 +29,10 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
+          
+          {/* Auth Routes */}
+          <Route path="/auth/teman" element={<TemanAuth />} />
+          <Route path="/auth/mitra" element={<MitraAuth />} />
           
           {/* Teman Routes */}
           <Route path="/teman/dashboard" element={<TemanDashboard />} />

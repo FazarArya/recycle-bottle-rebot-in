@@ -59,7 +59,7 @@ const UserTypes = () => {
                 </div>
               </div>
               <Button asChild className="w-full" size="lg">
-                <Link to="/teman/dashboard">
+                <Link to="/auth/teman">
                   Daftar Sebagai Teman
                 </Link>
               </Button>
@@ -107,7 +107,7 @@ const UserTypes = () => {
                 </div>
               </div>
               <Button asChild className="w-full" variant="secondary" size="lg">
-                <Link to="/mitra/dashboard">
+                <Link to="/auth/mitra">
                   Daftar Sebagai Mitra
                 </Link>
               </Button>
