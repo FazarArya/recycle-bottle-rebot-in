@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -28,13 +28,15 @@ const signupSchema = z.object({
 
 export default function TemanAuth() {
   const navigate = useNavigate();
-  const { signIn, signUp, user } = useAuth();
+  const { signIn, signUp, user, loading: authLoading } = useAuth();
   const [loading, setLoading] = useState(false);
 
-  // Redirect if already logged in
-  if (user) {
-    navigate('/teman/dashboard');
-  }
+  // Redirect if already logged in - use useEffect to prevent setState during render
+  useEffect(() => {
+    if (user && !authLoading) {
+      navigate('/teman/dashboard');
+    }
+  }, [user, authLoading, navigate]);
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
