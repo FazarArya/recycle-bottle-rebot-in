@@ -11,16 +11,30 @@ export function useAuth() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    let mounted = true;
+
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
+        if (!mounted) return;
+        
         setSession(session);
         setUser(session?.user ?? null);
         
-        // Fetch user role after state update
+        // Defer Supabase calls with setTimeout to prevent deadlock
         if (session?.user) {
-          setTimeout(() => {
-            fetchUserRole(session.user.id);
+          setTimeout(async () => {
+            if (!mounted) return;
+            
+            const { data } = await supabase
+              .from('user_roles')
+              .select('role')
+              .eq('user_id', session.user.id)
+              .single();
+            
+            if (mounted && data) {
+              setUserRole(data.role as 'teman' | 'mitra');
+            }
           }, 0);
         } else {
           setUserRole(null);
@@ -32,29 +46,23 @@ export function useAuth() {
 
     // THEN check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!mounted) return;
+      
+      // Only set session and user, role will be set by onAuthStateChange
       setSession(session);
       setUser(session?.user ?? null);
       
-      if (session?.user) {
-        fetchUserRole(session.user.id);
+      if (!session) {
+        setLoading(false);
       }
-      setLoading(false);
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
-  const fetchUserRole = async (userId: string) => {
-    const { data, error } = await supabase
-      .from('user_roles')
-      .select('role')
-      .eq('user_id', userId)
-      .single();
-    
-    if (!error && data) {
-      setUserRole(data.role as 'teman' | 'mitra');
-    }
-  };
 
   const signUp = async (email: string, password: string, nama: string, no_hp: string, role: 'teman' | 'mitra', kode_mitra?: string) => {
     const redirectUrl = `${window.location.origin}/`;
