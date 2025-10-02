@@ -1,19 +1,41 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Coins, TrendingUp, Recycle, Award, History, DollarSign } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { useUserData } from "@/hooks/useUserData";
+import { useAuth } from "@/hooks/useAuth";
+import { useEffect } from "react";
 
 const TemanDashboard = () => {
-  // Mock data - nanti akan diganti dengan data real dari backend
-  const userData = {
-    name: "Ahmad Wijaya",
-    greenCoin: 12500,
-    bottlesRecycled: 145,
-    co2Saved: 72.5,
-    treesEquivalent: 3
-  };
+  const { userData, loading } = useUserData();
+  const { user } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!user && !loading) {
+      navigate('/auth/teman');
+    }
+  }, [user, loading, navigate]);
+
+  if (loading || !userData) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navbar />
+        <main className="container mx-auto px-4 py-8 mt-20">
+          <div className="text-center py-12">
+            <p className="text-muted-foreground">Memuat data...</p>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  // Calculate environmental impact
+  const co2Saved = (userData.total_botol * 0.5).toFixed(1); // 0.5 kg CO2 per bottle
+  const treesEquivalent = Math.floor(userData.total_botol / 50); // 1 tree per 50 bottles
 
   return (
     <div className="min-h-screen bg-background">
@@ -24,7 +46,7 @@ const TemanDashboard = () => {
             Dashboard Teman
           </h1>
           <p className="text-muted-foreground">
-            Selamat datang, {userData.name}! 🌱
+            Selamat datang, {userData.nama}! 🌱
           </p>
         </div>
 
@@ -43,7 +65,7 @@ const TemanDashboard = () => {
           </CardHeader>
           <CardContent>
             <div className="text-4xl font-bold text-primary mb-4">
-              {userData.greenCoin.toLocaleString('id-ID')} GC
+              {userData.saldo_coin.toLocaleString('id-ID')} GC
             </div>
             <div className="flex gap-3">
               <Button asChild className="flex-1">
@@ -78,7 +100,7 @@ const TemanDashboard = () => {
               </CardHeader>
               <CardContent>
                 <div className="text-3xl font-bold text-foreground">
-                  {userData.bottlesRecycled}
+                  {userData.total_botol}
                 </div>
                 <p className="text-sm text-muted-foreground mt-1">
                   botol berhasil didaur ulang
@@ -95,7 +117,7 @@ const TemanDashboard = () => {
               </CardHeader>
               <CardContent>
                 <div className="text-3xl font-bold text-foreground">
-                  {userData.co2Saved} kg
+                  {co2Saved} kg
                 </div>
                 <p className="text-sm text-muted-foreground mt-1">
                   emisi karbon dioksida
@@ -112,7 +134,7 @@ const TemanDashboard = () => {
               </CardHeader>
               <CardContent>
                 <div className="text-3xl font-bold text-foreground">
-                  {userData.treesEquivalent}
+                  {treesEquivalent}
                 </div>
                 <p className="text-sm text-muted-foreground mt-1">
                   pohon yang diselamatkan

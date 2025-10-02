@@ -1,32 +1,86 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { User, Mail, Phone, MapPin, ArrowLeft, Edit2, Save } from "lucide-react";
-import { Link } from "react-router-dom";
+import { User, Mail, Phone, ArrowLeft, Edit2, Save } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useToast } from "@/hooks/use-toast";
+import { useUserData } from "@/hooks/useUserData";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 
 const TemanProfil = () => {
   const { toast } = useToast();
+  const { userData, loading, refreshUserData } = useUserData();
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
-    name: "Ahmad Wijaya",
-    email: "ahmad.wijaya@email.com",
-    phone: "081234567890",
-    address: "Jl. Sudirman No. 123, Jakarta Pusat"
+    nama: "",
+    email: "",
+    no_hp: ""
   });
 
-  const handleSave = () => {
-    setIsEditing(false);
-    toast({
-      title: "Profil berhasil diperbarui",
-      description: "Data profil Anda telah disimpan"
-    });
+  useEffect(() => {
+    if (!user && !loading) {
+      navigate('/auth/teman');
+    }
+  }, [user, loading, navigate]);
+
+  useEffect(() => {
+    if (userData) {
+      setFormData({
+        nama: userData.nama,
+        email: userData.email,
+        no_hp: userData.no_hp || ""
+      });
+    }
+  }, [userData]);
+
+  const handleSave = async () => {
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          nama: formData.nama,
+          no_hp: formData.no_hp
+        })
+        .eq('id', user!.id);
+
+      if (error) throw error;
+
+      setIsEditing(false);
+      refreshUserData();
+      toast({
+        title: "Profil berhasil diperbarui",
+        description: "Data profil Anda telah disimpan.",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Gagal memperbarui profil",
+        description: error.message,
+        variant: "destructive"
+      });
+    }
   };
+
+  if (loading || !userData) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navbar />
+        <main className="container mx-auto px-4 py-8 mt-20">
+          <div className="text-center py-12">
+            <p className="text-muted-foreground">Memuat data...</p>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -76,7 +130,7 @@ const TemanProfil = () => {
             <div className="flex items-center gap-6">
               <Avatar className="w-24 h-24">
                 <AvatarFallback className="bg-primary text-primary-foreground text-2xl">
-                  {formData.name.split(' ').map(n => n[0]).join('')}
+                  {userData.nama.split(' ').map(n => n[0]).join('')}
                 </AvatarFallback>
               </Avatar>
               {isEditing && (
@@ -88,14 +142,14 @@ const TemanProfil = () => {
 
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="name" className="flex items-center gap-2">
+                <Label htmlFor="nama" className="flex items-center gap-2">
                   <User className="w-4 h-4" />
                   Nama Lengkap
                 </Label>
                 <Input
-                  id="name"
-                  value={formData.name}
-                  onChange={(e) => setFormData({...formData, name: e.target.value})}
+                  id="nama"
+                  value={formData.nama}
+                  onChange={(e) => setFormData({...formData, nama: e.target.value})}
                   disabled={!isEditing}
                 />
               </div>
@@ -109,34 +163,22 @@ const TemanProfil = () => {
                   id="email"
                   type="email"
                   value={formData.email}
-                  onChange={(e) => setFormData({...formData, email: e.target.value})}
-                  disabled={!isEditing}
+                  disabled={true}
+                  className="bg-muted"
                 />
+                <p className="text-xs text-muted-foreground">Email tidak dapat diubah</p>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="phone" className="flex items-center gap-2">
+                <Label htmlFor="no_hp" className="flex items-center gap-2">
                   <Phone className="w-4 h-4" />
                   Nomor Telepon
                 </Label>
                 <Input
-                  id="phone"
+                  id="no_hp"
                   type="tel"
-                  value={formData.phone}
-                  onChange={(e) => setFormData({...formData, phone: e.target.value})}
-                  disabled={!isEditing}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="address" className="flex items-center gap-2">
-                  <MapPin className="w-4 h-4" />
-                  Alamat
-                </Label>
-                <Input
-                  id="address"
-                  value={formData.address}
-                  onChange={(e) => setFormData({...formData, address: e.target.value})}
+                  value={formData.no_hp}
+                  onChange={(e) => setFormData({...formData, no_hp: e.target.value})}
                   disabled={!isEditing}
                 />
               </div>
@@ -152,20 +194,20 @@ const TemanProfil = () => {
           <CardContent>
             <div className="grid grid-cols-2 gap-4">
               <div className="p-4 bg-primary/10 rounded-lg">
-                <div className="text-2xl font-bold text-primary">145</div>
+                <div className="text-2xl font-bold text-primary">{userData.total_botol}</div>
                 <div className="text-sm text-muted-foreground">Botol Didaur Ulang</div>
               </div>
               <div className="p-4 bg-secondary/10 rounded-lg">
-                <div className="text-2xl font-bold text-secondary">12,500</div>
-                <div className="text-sm text-muted-foreground">Total GreenCoin</div>
+                <div className="text-2xl font-bold text-secondary">{userData.saldo_coin.toLocaleString('id-ID')}</div>
+                <div className="text-sm text-muted-foreground">Saldo GreenCoin</div>
               </div>
               <div className="p-4 bg-accent/30 rounded-lg">
-                <div className="text-2xl font-bold text-foreground">8</div>
-                <div className="text-sm text-muted-foreground">Kali Pencairan</div>
+                <div className="text-2xl font-bold text-foreground">{(userData.total_botol * 0.5).toFixed(1)}</div>
+                <div className="text-sm text-muted-foreground">kg CO₂ Dikurangi</div>
               </div>
               <div className="p-4 bg-accent/30 rounded-lg">
-                <div className="text-2xl font-bold text-foreground">3</div>
-                <div className="text-sm text-muted-foreground">Bulan Bergabung</div>
+                <div className="text-2xl font-bold text-foreground">{Math.floor((Date.now() - new Date(user!.created_at).getTime()) / (1000 * 60 * 60 * 24))}</div>
+                <div className="text-sm text-muted-foreground">Hari Bergabung</div>
               </div>
             </div>
           </CardContent>

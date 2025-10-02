@@ -1,25 +1,46 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Building2, Mail, Phone, MapPin, ArrowLeft, Edit2, Save, Activity } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Building2, Mail, Phone, ArrowLeft, Edit2, Save, Activity } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useToast } from "@/hooks/use-toast";
+import { useUserData } from "@/hooks/useUserData";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 
 const MitraProfil = () => {
   const { toast } = useToast();
+  const { userData, loading, refreshUserData } = useUserData();
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
-    companyName: "PT Hijau Sejahtera",
-    email: "info@hijausejahtera.com",
-    phone: "0215551234",
-    address: "Jl. Gatot Subroto No. 88, Jakarta Selatan"
+    nama: "",
+    email: "",
+    no_hp: ""
   });
+
+  useEffect(() => {
+    if (!user && !loading) {
+      navigate('/auth/mitra');
+    }
+  }, [user, loading, navigate]);
+
+  useEffect(() => {
+    if (userData) {
+      setFormData({
+        nama: userData.nama,
+        email: userData.email,
+        no_hp: userData.no_hp || ""
+      });
+    }
+  }, [userData]);
 
   const machines = [
     { id: "RVM-001", location: "T-Mart Sudirman", status: "Aktif" },
@@ -29,13 +50,46 @@ const MitraProfil = () => {
     { id: "RVM-005", location: "T-Mart Senayan", status: "Maintenance" }
   ];
 
-  const handleSave = () => {
-    setIsEditing(false);
-    toast({
-      title: "Profil berhasil diperbarui",
-      description: "Data profil mitra Anda telah disimpan"
-    });
+  const handleSave = async () => {
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          nama: formData.nama,
+          no_hp: formData.no_hp
+        })
+        .eq('id', user!.id);
+
+      if (error) throw error;
+
+      setIsEditing(false);
+      refreshUserData();
+      toast({
+        title: "Profil berhasil diperbarui",
+        description: "Data profil perusahaan Anda telah disimpan.",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Gagal memperbarui profil",
+        description: error.message,
+        variant: "destructive"
+      });
+    }
   };
+
+  if (loading || !userData) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navbar />
+        <main className="container mx-auto px-4 py-8 mt-20">
+          <div className="text-center py-12">
+            <p className="text-muted-foreground">Memuat data...</p>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -98,14 +152,14 @@ const MitraProfil = () => {
 
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="companyName" className="flex items-center gap-2">
+                  <Label htmlFor="nama" className="flex items-center gap-2">
                     <Building2 className="w-4 h-4" />
                     Nama Perusahaan
                   </Label>
                   <Input
-                    id="companyName"
-                    value={formData.companyName}
-                    onChange={(e) => setFormData({...formData, companyName: e.target.value})}
+                    id="nama"
+                    value={formData.nama}
+                    onChange={(e) => setFormData({...formData, nama: e.target.value})}
                     disabled={!isEditing}
                   />
                 </div>
@@ -119,34 +173,22 @@ const MitraProfil = () => {
                     id="email"
                     type="email"
                     value={formData.email}
-                    onChange={(e) => setFormData({...formData, email: e.target.value})}
-                    disabled={!isEditing}
+                    disabled={true}
+                    className="bg-muted"
                   />
+                  <p className="text-xs text-muted-foreground">Email tidak dapat diubah</p>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="phone" className="flex items-center gap-2">
+                  <Label htmlFor="no_hp" className="flex items-center gap-2">
                     <Phone className="w-4 h-4" />
                     Nomor Telepon
                   </Label>
                   <Input
-                    id="phone"
+                    id="no_hp"
                     type="tel"
-                    value={formData.phone}
-                    onChange={(e) => setFormData({...formData, phone: e.target.value})}
-                    disabled={!isEditing}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="address" className="flex items-center gap-2">
-                    <MapPin className="w-4 h-4" />
-                    Alamat
-                  </Label>
-                  <Input
-                    id="address"
-                    value={formData.address}
-                    onChange={(e) => setFormData({...formData, address: e.target.value})}
+                    value={formData.no_hp}
+                    onChange={(e) => setFormData({...formData, no_hp: e.target.value})}
                     disabled={!isEditing}
                   />
                 </div>
@@ -170,12 +212,12 @@ const MitraProfil = () => {
                   <div className="text-sm text-muted-foreground">Total Botol</div>
                 </div>
                 <div className="p-4 bg-accent/30 rounded-lg">
-                  <div className="text-2xl font-bold text-foreground">85,000</div>
+                  <div className="text-2xl font-bold text-foreground">{userData.saldo_coin.toLocaleString('id-ID')}</div>
                   <div className="text-sm text-muted-foreground">GC Terdistribusi</div>
                 </div>
                 <div className="p-4 bg-accent/30 rounded-lg">
-                  <div className="text-2xl font-bold text-foreground">8,500</div>
-                  <div className="text-sm text-muted-foreground">Total Komisi</div>
+                  <div className="text-2xl font-bold text-foreground">{Math.floor(userData.saldo_coin * 0.1).toLocaleString('id-ID')}</div>
+                  <div className="text-sm text-muted-foreground">Total Komisi (10%)</div>
                 </div>
               </div>
             </CardContent>

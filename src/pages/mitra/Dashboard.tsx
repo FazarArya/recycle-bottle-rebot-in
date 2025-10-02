@@ -2,20 +2,45 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Building2, Coins, Activity, TrendingUp, MapPin, History, Settings } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { useUserData } from "@/hooks/useUserData";
+import { useAuth } from "@/hooks/useAuth";
+import { useEffect } from "react";
 
 const MitraDashboard = () => {
-  // Mock data - nanti akan diganti dengan data real dari backend
-  const mitraData = {
-    name: "PT Hijau Sejahtera",
+  const { userData, loading } = useUserData();
+  const { user } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!user && !loading) {
+      navigate('/auth/mitra');
+    }
+  }, [user, loading, navigate]);
+
+  if (loading || !userData) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navbar />
+        <main className="container mx-auto px-4 py-8 mt-20">
+          <div className="text-center py-12">
+            <p className="text-muted-foreground">Memuat data...</p>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  // Mock machine data - will be replaced with real data later
+  const mitraStats = {
     totalMachines: 5,
     activeMachines: 4,
-    totalCoins: 85000,
-    commission: 8500,
     totalBottles: 1250,
-    totalWeight: 125
+    totalWeight: 125,
+    commission: Math.floor(userData.saldo_coin * 0.1) // 10% commission
   };
 
   const machines = [
@@ -80,7 +105,7 @@ const MitraDashboard = () => {
             Dashboard Mitra
           </h1>
           <p className="text-muted-foreground">
-            Selamat datang, {mitraData.name}! 🏢
+            Selamat datang, {userData.nama}! 🏢
           </p>
         </div>
 
@@ -99,7 +124,7 @@ const MitraDashboard = () => {
           </CardHeader>
           <CardContent>
             <div className="text-4xl font-bold text-secondary mb-4">
-              {mitraData.commission.toLocaleString('id-ID')} GC
+              {mitraStats.commission.toLocaleString('id-ID')} GC
             </div>
             <div className="flex gap-3">
               <Button asChild variant="secondary" className="flex-1">
@@ -129,10 +154,10 @@ const MitraDashboard = () => {
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold text-foreground">
-                {mitraData.totalMachines}
+                {mitraStats.totalMachines}
               </div>
               <p className="text-sm text-muted-foreground mt-1">
-                {mitraData.activeMachines} mesin aktif
+                {mitraStats.activeMachines} mesin aktif
               </p>
             </CardContent>
           </Card>
@@ -146,7 +171,7 @@ const MitraDashboard = () => {
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold text-foreground">
-                {mitraData.totalBottles}
+                {mitraStats.totalBottles}
               </div>
               <p className="text-sm text-muted-foreground mt-1">
                 botol terkumpul
@@ -163,7 +188,7 @@ const MitraDashboard = () => {
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold text-foreground">
-                {mitraData.totalWeight} kg
+                {mitraStats.totalWeight} kg
               </div>
               <p className="text-sm text-muted-foreground mt-1">
                 plastik didaur ulang
@@ -180,7 +205,7 @@ const MitraDashboard = () => {
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold text-foreground">
-                {mitraData.totalCoins.toLocaleString('id-ID')}
+                {userData.saldo_coin.toLocaleString('id-ID')}
               </div>
               <p className="text-sm text-muted-foreground mt-1">
                 GC terdistribusi
