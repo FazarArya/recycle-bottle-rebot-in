@@ -57,15 +57,15 @@ export default function MitraAuth() {
         } else {
           toast.error(error.message);
         }
+        setLoading(false);
       } else {
         toast.success('Berhasil masuk!');
-        navigate('/mitra/dashboard');
+        // Don't navigate here - useEffect will handle redirect automatically
       }
     } catch (error) {
       if (error instanceof z.ZodError) {
         toast.error(error.errors[0].message);
       }
-    } finally {
       setLoading(false);
     }
   };
@@ -79,8 +79,8 @@ export default function MitraAuth() {
     const email = formData.get('email') as string;
     const no_hp = formData.get('no_hp') as string;
     const kode_mitra = formData.get('kode_mitra') as string;
-    const password = formData.get('password') as string;
     const confirmPassword = formData.get('confirmPassword') as string;
+    const password = formData.get('password') as string;
 
     try {
       const validated = signupSchema.parse({ nama, email, no_hp, kode_mitra, password, confirmPassword });
@@ -99,14 +99,15 @@ export default function MitraAuth() {
         } else {
           toast.error(error.message);
         }
+        setLoading(false);
       } else {
         toast.success('Pendaftaran berhasil! Silakan cek email untuk verifikasi.');
+        setLoading(false);
       }
     } catch (error) {
       if (error instanceof z.ZodError) {
         toast.error(error.errors[0].message);
       }
-    } finally {
       setLoading(false);
     }
   };

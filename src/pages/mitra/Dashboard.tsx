@@ -10,17 +10,17 @@ import { useAuth } from "@/hooks/useAuth";
 import { useEffect } from "react";
 
 const MitraDashboard = () => {
-  const { userData, loading } = useUserData();
-  const { user } = useAuth();
+  const { userData, loading: dataLoading } = useUserData();
+  const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!user && !loading) {
+    if (!authLoading && !user) {
       navigate('/auth/mitra');
     }
-  }, [user, loading, navigate]);
+  }, [user, authLoading, navigate]);
 
-  if (loading || !userData) {
+  if (authLoading || dataLoading || !userData) {
     return (
       <div className="min-h-screen bg-background">
         <Navbar />

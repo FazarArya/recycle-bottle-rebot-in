@@ -56,15 +56,15 @@ export default function TemanAuth() {
         } else {
           toast.error(error.message);
         }
+        setLoading(false);
       } else {
         toast.success('Berhasil masuk!');
-        navigate('/teman/dashboard');
+        // Don't navigate here - useEffect will handle redirect automatically
       }
     } catch (error) {
       if (error instanceof z.ZodError) {
         toast.error(error.errors[0].message);
       }
-    } finally {
       setLoading(false);
     }
   };
@@ -96,14 +96,15 @@ export default function TemanAuth() {
         } else {
           toast.error(error.message);
         }
+        setLoading(false);
       } else {
         toast.success('Pendaftaran berhasil! Silakan cek email untuk verifikasi.');
+        setLoading(false);
       }
     } catch (error) {
       if (error instanceof z.ZodError) {
         toast.error(error.errors[0].message);
       }
-    } finally {
       setLoading(false);
     }
   };
