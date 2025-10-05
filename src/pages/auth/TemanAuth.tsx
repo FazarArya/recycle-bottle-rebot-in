@@ -100,7 +100,7 @@ export default function TemanAuth() {
       const validated = signupSchema.parse({ nama, email, no_hp, password, confirmPassword });
       
       // Signup user
-      const { error } = await signUp(
+      const { data, error } = await signUp(
         validated.email,
         validated.password,
         validated.nama,
@@ -109,8 +109,8 @@ export default function TemanAuth() {
       );
 
       if (error) {
-        if (error.message.includes('already registered')) {
-          toast.error('Email sudah terdaftar');
+        if (error.message.includes('already registered') || error.message.includes('User already registered')) {
+          toast.error('Email sudah terdaftar. Silakan login atau gunakan email lain.');
         } else {
           toast.error(error.message);
         }
@@ -118,25 +118,17 @@ export default function TemanAuth() {
         return;
       }
 
-      // Send OTP using Supabase built-in Email OTP
-      const { error: otpError } = await supabase.auth.signInWithOtp({
-        email: validated.email,
-        options: {
-          shouldCreateUser: false,
-        }
-      });
-
-      if (otpError) {
-        toast.error('Gagal mengirim kode OTP: ' + otpError.message);
+      // Store the new user info for verification
+      if (data?.user) {
+        setPendingEmail(validated.email);
+        setPendingNama(validated.nama);
+        setShowOTPVerification(true);
+        toast.success('Pendaftaran berhasil! Silakan cek email Anda untuk kode verifikasi.');
         setLoading(false);
-        return;
+      } else {
+        toast.error('Terjadi kesalahan saat mendaftar');
+        setLoading(false);
       }
-
-      setPendingEmail(validated.email);
-      setPendingNama(validated.nama);
-      setShowOTPVerification(true);
-      toast.success('Kode OTP telah dikirim ke email Anda!');
-      setLoading(false);
     } catch (error) {
       if (error instanceof z.ZodError) {
         toast.error(error.errors[0].message);
