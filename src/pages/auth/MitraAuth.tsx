@@ -9,6 +9,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 import { z } from 'zod';
 import { Building2 } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 
 const loginSchema = z.object({
   email: z.string().trim().email({ message: 'Email tidak valid' }),
@@ -32,10 +33,22 @@ export default function MitraAuth() {
   const { signIn, signUp, user, loading: authLoading } = useAuth();
   const [loading, setLoading] = useState(false);
 
-  // Redirect if already logged in - use useEffect to prevent setState during render
+  // Redirect if already logged in
   useEffect(() => {
     if (user && !authLoading) {
-      navigate('/mitra/dashboard');
+      // Only navigate after successful login, not on initial load
+      const checkAndRedirect = async () => {
+        const { data } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', user.id)
+          .single();
+        
+        if (data?.role === 'mitra') {
+          navigate('/mitra/dashboard');
+        }
+      };
+      checkAndRedirect();
     }
   }, [user, authLoading, navigate]);
 

@@ -15,8 +15,8 @@ import { supabase } from "@/integrations/supabase/client";
 
 const TemanProfil = () => {
   const { toast } = useToast();
-  const { userData, loading, refreshUserData } = useUserData();
-  const { user } = useAuth();
+  const { userData, loading: dataLoading, refreshUserData } = useUserData();
+  const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
@@ -26,10 +26,10 @@ const TemanProfil = () => {
   });
 
   useEffect(() => {
-    if (!user && !loading) {
+    if (!authLoading && !user) {
       navigate('/auth/teman');
     }
-  }, [user, loading, navigate]);
+  }, [user, authLoading, navigate]);
 
   useEffect(() => {
     if (userData) {
@@ -68,7 +68,7 @@ const TemanProfil = () => {
     }
   };
 
-  if (loading || !userData) {
+  if (authLoading || dataLoading || !userData) {
     return (
       <div className="min-h-screen bg-background">
         <Navbar />
