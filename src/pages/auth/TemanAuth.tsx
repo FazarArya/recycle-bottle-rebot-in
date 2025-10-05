@@ -31,6 +31,9 @@ export default function TemanAuth() {
   const navigate = useNavigate();
   const { signIn, signUp, user, loading: authLoading } = useAuth();
   const [loading, setLoading] = useState(false);
+  const [showOTPVerification, setShowOTPVerification] = useState(false);
+  const [pendingEmail, setPendingEmail] = useState('');
+  const [pendingNama, setPendingNama] = useState('');
 
   // Redirect if already logged in
   useEffect(() => {
@@ -95,6 +98,8 @@ export default function TemanAuth() {
 
     try {
       const validated = signupSchema.parse({ nama, email, no_hp, password, confirmPassword });
+      
+      // Signup user without email confirmation
       const { error } = await signUp(
         validated.email,
         validated.password,
@@ -110,10 +115,25 @@ export default function TemanAuth() {
           toast.error(error.message);
         }
         setLoading(false);
-      } else {
-        toast.success('Pendaftaran berhasil! Silakan cek email untuk verifikasi.');
-        setLoading(false);
+        return;
       }
+
+      // Send OTP
+      const { data: otpData, error: otpError } = await supabase.functions.invoke('send-otp-email', {
+        body: { email: validated.email, nama: validated.nama }
+      });
+
+      if (otpError) {
+        toast.error('Gagal mengirim kode OTP');
+        setLoading(false);
+        return;
+      }
+
+      setPendingEmail(validated.email);
+      setPendingNama(validated.nama);
+      setShowOTPVerification(true);
+      toast.success('Kode OTP telah dikirim ke email Anda!');
+      setLoading(false);
     } catch (error) {
       if (error instanceof z.ZodError) {
         toast.error(error.errors[0].message);
@@ -121,6 +141,80 @@ export default function TemanAuth() {
       setLoading(false);
     }
   };
+
+  const handleVerifyOTP = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setLoading(true);
+
+    const formData = new FormData(e.currentTarget);
+    const otp = formData.get('otp') as string;
+
+    try {
+      const { data, error } = await supabase.functions.invoke('verify-otp', {
+        body: { email: pendingEmail, otp }
+      });
+
+      if (error || !data?.success) {
+        toast.error(data?.error || 'Kode OTP tidak valid');
+        setLoading(false);
+        return;
+      }
+
+      toast.success('Verifikasi berhasil! Silakan login.');
+      setShowOTPVerification(false);
+      setPendingEmail('');
+      setPendingNama('');
+      setLoading(false);
+    } catch (error) {
+      toast.error('Terjadi kesalahan saat verifikasi');
+      setLoading(false);
+    }
+  };
+
+  if (showOTPVerification) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-background via-secondary/30 to-accent/20 flex items-center justify-center p-4">
+        <Card className="w-full max-w-md">
+          <CardHeader className="space-y-1 text-center">
+            <div className="flex justify-center mb-4">
+              <div className="bg-primary/10 p-3 rounded-full">
+                <Leaf className="h-8 w-8 text-primary" />
+              </div>
+            </div>
+            <CardTitle className="text-2xl font-bold">Verifikasi Email</CardTitle>
+            <CardDescription>Masukkan kode OTP yang telah dikirim ke {pendingEmail}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleVerifyOTP} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="otp">Kode OTP (6 digit)</Label>
+                <Input
+                  id="otp"
+                  name="otp"
+                  type="text"
+                  placeholder="123456"
+                  maxLength={6}
+                  required
+                />
+              </div>
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading ? 'Memverifikasi...' : 'Verifikasi'}
+              </Button>
+            </form>
+          </CardContent>
+          <CardFooter className="flex flex-col gap-2">
+            <Button 
+              variant="ghost" 
+              className="w-full" 
+              onClick={() => setShowOTPVerification(false)}
+            >
+              Kembali
+            </Button>
+          </CardFooter>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-secondary/30 to-accent/20 flex items-center justify-center p-4">
