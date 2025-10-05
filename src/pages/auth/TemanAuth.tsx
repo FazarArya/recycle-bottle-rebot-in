@@ -99,7 +99,7 @@ export default function TemanAuth() {
     try {
       const validated = signupSchema.parse({ nama, email, no_hp, password, confirmPassword });
       
-      // Signup user without email confirmation
+      // Signup user
       const { error } = await signUp(
         validated.email,
         validated.password,
@@ -118,13 +118,16 @@ export default function TemanAuth() {
         return;
       }
 
-      // Send OTP
-      const { data: otpData, error: otpError } = await supabase.functions.invoke('send-otp-email', {
-        body: { email: validated.email, nama: validated.nama }
+      // Send OTP using Supabase built-in Email OTP
+      const { error: otpError } = await supabase.auth.signInWithOtp({
+        email: validated.email,
+        options: {
+          shouldCreateUser: false,
+        }
       });
 
       if (otpError) {
-        toast.error('Gagal mengirim kode OTP');
+        toast.error('Gagal mengirim kode OTP: ' + otpError.message);
         setLoading(false);
         return;
       }
@@ -150,21 +153,25 @@ export default function TemanAuth() {
     const otp = formData.get('otp') as string;
 
     try {
-      const { data, error } = await supabase.functions.invoke('verify-otp', {
-        body: { email: pendingEmail, otp }
+      // Verify OTP using Supabase built-in verification
+      const { error } = await supabase.auth.verifyOtp({
+        email: pendingEmail,
+        token: otp,
+        type: 'email'
       });
 
-      if (error || !data?.success) {
-        toast.error(data?.error || 'Kode OTP tidak valid');
+      if (error) {
+        toast.error('Kode OTP tidak valid atau sudah kadaluarsa');
         setLoading(false);
         return;
       }
 
-      toast.success('Verifikasi berhasil! Silakan login.');
+      toast.success('Verifikasi berhasil! Anda sudah login.');
       setShowOTPVerification(false);
       setPendingEmail('');
       setPendingNama('');
       setLoading(false);
+      // User will be automatically redirected by useEffect
     } catch (error) {
       toast.error('Terjadi kesalahan saat verifikasi');
       setLoading(false);
