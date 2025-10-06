@@ -191,30 +191,39 @@ export type Database = {
       }
       transactions_coin: {
         Row: {
+          barcode_code: string | null
           biaya_layanan: number
           created_at: string
+          expires_at: string | null
           id: string
           jumlah_coin: number
+          redeemed_at: string | null
           status: string
           timestamp: string
           total_diterima: number
           user_id: string
         }
         Insert: {
+          barcode_code?: string | null
           biaya_layanan?: number
           created_at?: string
+          expires_at?: string | null
           id?: string
           jumlah_coin: number
+          redeemed_at?: string | null
           status?: string
           timestamp?: string
           total_diterima: number
           user_id: string
         }
         Update: {
+          barcode_code?: string | null
           biaya_layanan?: number
           created_at?: string
+          expires_at?: string | null
           id?: string
           jumlah_coin?: number
+          redeemed_at?: string | null
           status?: string
           timestamp?: string
           total_diterima?: number

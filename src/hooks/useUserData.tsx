@@ -3,6 +3,9 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 
 export interface UserData {
+  // User ID
+  id: string;
+  
   // Profile data
   nama: string;
   email: string;
@@ -57,6 +60,7 @@ export function useUserData() {
         // Combine all data only if component is still mounted
         if (mounted) {
           setUserData({
+            id: user.id,
             ...profileData,
             ...userData,
             role: userRole
@@ -108,6 +112,7 @@ export function useUserData() {
 
       // Combine all data
       setUserData({
+        id: user.id,
         ...profileData,
         ...userData,
         role: userRole
