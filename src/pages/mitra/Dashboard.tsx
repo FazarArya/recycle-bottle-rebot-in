@@ -261,11 +261,18 @@ const MitraDashboard = () => {
                           </div>
                         </div>
                       </div>
-                      <div className="text-right">
-                        <div className={`text-2xl font-bold ${getFillColor(machine.fill)}`}>
-                          {machine.fill}%
+                      <div className="flex flex-col items-end gap-2">
+                        <div className="text-right">
+                          <div className={`text-2xl font-bold ${getFillColor(machine.fill)}`}>
+                            {machine.fill}%
+                          </div>
+                          <div className="text-xs text-muted-foreground">Kapasitas</div>
                         </div>
-                        <div className="text-xs text-muted-foreground">Kapasitas</div>
+                        <Button asChild variant="outline" size="sm">
+                          <Link to={`/mitra/machine/${machine.id}`}>
+                            Detail
+                          </Link>
+                        </Button>
                       </div>
                     </div>
                   </CardContent>

@@ -18,6 +18,7 @@ import MitraDashboard from "./pages/mitra/Dashboard";
 import MitraRiwayat from "./pages/mitra/Riwayat";
 import MitraPencairan from "./pages/mitra/Pencairan";
 import MitraProfil from "./pages/mitra/Profil";
+import MachineDetail from "./pages/mitra/MachineDetail";
 
 const queryClient = new QueryClient();
 
@@ -45,6 +46,7 @@ const App = () => (
           <Route path="/mitra/riwayat" element={<MitraRiwayat />} />
           <Route path="/mitra/pencairan" element={<MitraPencairan />} />
           <Route path="/mitra/profil" element={<MitraProfil />} />
+          <Route path="/mitra/machine/:id" element={<MachineDetail />} />
           
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
