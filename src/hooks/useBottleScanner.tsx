@@ -69,7 +69,7 @@ export function useBottleScanner(userId: string | undefined, onScanComplete: (re
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [userId, onScanComplete]);
+  }, [userId]); // Removed onScanComplete from dependencies to prevent re-subscriptions
 
   return { isListening };
 }
