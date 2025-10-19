@@ -80,6 +80,7 @@ export type Database = {
         Row: {
           created_at: string
           id: string
+          kode_mitra: string
           koneksi: string
           last_update: string
           lokasi: string
@@ -90,6 +91,7 @@ export type Database = {
         Insert: {
           created_at?: string
           id?: string
+          kode_mitra: string
           koneksi?: string
           last_update?: string
           lokasi: string
@@ -100,6 +102,7 @@ export type Database = {
         Update: {
           created_at?: string
           id?: string
+          kode_mitra?: string
           koneksi?: string
           last_update?: string
           lokasi?: string

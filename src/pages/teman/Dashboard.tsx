@@ -1,17 +1,35 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Coins, TrendingUp, Recycle, Award, History, DollarSign } from "lucide-react";
+import { Coins, TrendingUp, Recycle, Award, History, DollarSign, Scan } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useUserData } from "@/hooks/useUserData";
 import { useAuth } from "@/hooks/useAuth";
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
+import { ScanBottleModal } from "@/components/teman/ScanBottleModal";
+import { BottleScannedNotification } from "@/components/teman/BottleScannedNotification";
+import { useBottleScanner } from "@/hooks/useBottleScanner";
 
 const TemanDashboard = () => {
-  const { userData, loading: dataLoading } = useUserData();
+  const { userData, loading: dataLoading, refreshUserData } = useUserData();
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
+  
+  const [scanModalOpen, setScanModalOpen] = useState(false);
+  const [notificationOpen, setNotificationOpen] = useState(false);
+  const [scanResult, setScanResult] = useState<{
+    bottleData: any[];
+    totalCoin: number;
+    machineLocation: string;
+  } | null>(null);
+
+  // Listen for bottle scans from ESP32
+  useBottleScanner(user?.id, (result) => {
+    setScanResult(result);
+    setNotificationOpen(true);
+    refreshUserData(); // Refresh to show updated balance
+  });
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -49,6 +67,27 @@ const TemanDashboard = () => {
             Selamat datang, {userData.nama}! 🌱
           </p>
         </div>
+
+        {/* Scan Botol Button */}
+        <Card className="mb-6 border-2 border-primary bg-gradient-to-r from-primary to-secondary text-primary-foreground">
+          <CardContent className="py-6">
+            <div className="flex items-center justify-between">
+              <div className="flex-1">
+                <h3 className="text-xl font-bold mb-1">Scan Botol Sekarang</h3>
+                <p className="text-sm opacity-90">Tukar botol plastik menjadi GreenCoin</p>
+              </div>
+              <Button 
+                size="lg" 
+                variant="secondary"
+                onClick={() => setScanModalOpen(true)}
+                className="ml-4"
+              >
+                <Scan className="w-5 h-5 mr-2" />
+                Mulai Scan
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* GreenCoin Card */}
         <Card className="mb-8 border-2 border-primary bg-gradient-to-br from-primary/10 to-secondary/10">
@@ -173,6 +212,26 @@ const TemanDashboard = () => {
             </div>
           </CardContent>
         </Card>
+
+        {/* Modals */}
+        <ScanBottleModal
+          open={scanModalOpen}
+          onOpenChange={setScanModalOpen}
+          userId={userData.id}
+          onSuccess={() => {
+            // Modal closed, now listening for scan results from ESP32
+          }}
+        />
+        
+        {scanResult && (
+          <BottleScannedNotification
+            open={notificationOpen}
+            onOpenChange={setNotificationOpen}
+            bottleData={scanResult.bottleData}
+            totalCoin={scanResult.totalCoin}
+            machineLocation={scanResult.machineLocation}
+          />
+        )}
       </main>
       <Footer />
     </div>
