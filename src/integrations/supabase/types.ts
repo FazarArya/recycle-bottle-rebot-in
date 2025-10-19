@@ -122,6 +122,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          alamat: string | null
           created_at: string
           email: string
           id: string
@@ -130,6 +131,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          alamat?: string | null
           created_at?: string
           email: string
           id: string
@@ -138,6 +140,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          alamat?: string | null
           created_at?: string
           email?: string
           id?: string
@@ -274,16 +277,19 @@ export type Database = {
       users: {
         Row: {
           id: string
+          komisi_mitra: number
           saldo_coin: number
           total_botol: number
         }
         Insert: {
           id: string
+          komisi_mitra?: number
           saldo_coin?: number
           total_botol?: number
         }
         Update: {
           id?: string
+          komisi_mitra?: number
           saldo_coin?: number
           total_botol?: number
         }

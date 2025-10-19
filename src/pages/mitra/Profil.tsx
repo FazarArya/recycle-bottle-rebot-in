@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Building2, Mail, Phone, ArrowLeft, Edit2, Save, Activity } from "lucide-react";
+import { Building2, Mail, Phone, ArrowLeft, Edit2, Save, Activity, MapPin, Tag } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -20,10 +20,13 @@ const MitraProfil = () => {
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
+  const [machines, setMachines] = useState<any[]>([]);
+  const [kodeMitra, setKodeMitra] = useState<string>('');
   const [formData, setFormData] = useState({
     nama: "",
     email: "",
-    no_hp: ""
+    no_hp: "",
+    alamat: ""
   });
 
   useEffect(() => {
@@ -37,18 +40,36 @@ const MitraProfil = () => {
       setFormData({
         nama: userData.nama,
         email: userData.email,
-        no_hp: userData.no_hp || ""
+        no_hp: userData.no_hp || "",
+        alamat: userData.alamat || ""
       });
     }
   }, [userData]);
 
-  const machines = [
-    { id: "RVM-001", location: "T-Mart Sudirman", status: "Aktif" },
-    { id: "RVM-002", location: "T-Mart Gatot Subroto", status: "Aktif" },
-    { id: "RVM-003", location: "T-Mart Thamrin", status: "Aktif" },
-    { id: "RVM-004", location: "T-Mart Kuningan", status: "Aktif" },
-    { id: "RVM-005", location: "T-Mart Senayan", status: "Maintenance" }
-  ];
+  useEffect(() => {
+    const fetchMachines = async () => {
+      if (!user) return;
+      
+      try {
+        const { data, error } = await supabase
+          .from('machines')
+          .select('*')
+          .eq('mitra_id', user.id);
+        
+        if (error) throw error;
+        setMachines(data || []);
+        
+        // Get kode_mitra from first machine
+        if (data && data.length > 0) {
+          setKodeMitra(data[0].kode_mitra);
+        }
+      } catch (error) {
+        console.error('Error fetching machines:', error);
+      }
+    };
+
+    fetchMachines();
+  }, [user]);
 
   const handleSave = async () => {
     try {
@@ -56,7 +77,8 @@ const MitraProfil = () => {
         .from('profiles')
         .update({
           nama: formData.nama,
-          no_hp: formData.no_hp
+          no_hp: formData.no_hp,
+          alamat: formData.alamat
         })
         .eq('id', user!.id);
 
@@ -192,6 +214,34 @@ const MitraProfil = () => {
                     disabled={!isEditing}
                   />
                 </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="alamat" className="flex items-center gap-2">
+                    <MapPin className="w-4 h-4" />
+                    Alamat
+                  </Label>
+                  <Input
+                    id="alamat"
+                    value={formData.alamat}
+                    onChange={(e) => setFormData({...formData, alamat: e.target.value})}
+                    disabled={!isEditing}
+                    placeholder="Masukkan alamat lengkap"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="kode_mitra" className="flex items-center gap-2">
+                    <Tag className="w-4 h-4" />
+                    Kode Mitra
+                  </Label>
+                  <Input
+                    id="kode_mitra"
+                    value={kodeMitra}
+                    disabled={true}
+                    className="bg-muted font-mono"
+                  />
+                  <p className="text-xs text-muted-foreground">Kode mitra hanya dapat diset saat registrasi</p>
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -204,11 +254,11 @@ const MitraProfil = () => {
             <CardContent>
               <div className="grid grid-cols-2 gap-4">
                 <div className="p-4 bg-secondary/10 rounded-lg">
-                  <div className="text-2xl font-bold text-secondary">5</div>
+                  <div className="text-2xl font-bold text-secondary">{machines.length}</div>
                   <div className="text-sm text-muted-foreground">Total Mesin</div>
                 </div>
                 <div className="p-4 bg-primary/10 rounded-lg">
-                  <div className="text-2xl font-bold text-primary">1,250</div>
+                  <div className="text-2xl font-bold text-primary">{userData.total_botol.toLocaleString('id-ID')}</div>
                   <div className="text-sm text-muted-foreground">Total Botol</div>
                 </div>
                 <div className="p-4 bg-accent/30 rounded-lg">
@@ -216,8 +266,8 @@ const MitraProfil = () => {
                   <div className="text-sm text-muted-foreground">GC Terdistribusi</div>
                 </div>
                 <div className="p-4 bg-accent/30 rounded-lg">
-                  <div className="text-2xl font-bold text-foreground">{Math.floor(userData.saldo_coin * 0.1).toLocaleString('id-ID')}</div>
-                  <div className="text-sm text-muted-foreground">Total Komisi (10%)</div>
+                  <div className="text-2xl font-bold text-foreground">{userData.komisi_mitra.toLocaleString('id-ID')}</div>
+                  <div className="text-sm text-muted-foreground">Total Komisi</div>
                 </div>
               </div>
             </CardContent>
@@ -234,35 +284,41 @@ const MitraProfil = () => {
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {machines.map((machine) => (
-                <div 
-                  key={machine.id}
-                  className="flex items-center justify-between p-4 border rounded-lg hover:bg-accent/30 transition-colors"
-                >
-                  <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-lg bg-secondary/10 flex items-center justify-center">
-                      <Building2 className="w-5 h-5 text-secondary" />
-                    </div>
-                    <div>
-                      <div className="font-semibold text-foreground flex items-center gap-2">
-                        {machine.location}
-                        <Badge 
-                          variant={machine.status === "Aktif" ? "default" : "destructive"}
-                          className="text-xs"
-                        >
-                          {machine.status}
-                        </Badge>
+              {machines.length === 0 ? (
+                <p className="text-center text-muted-foreground py-8">Belum ada mesin RVM terdaftar</p>
+              ) : (
+                machines.map((machine) => (
+                  <div 
+                    key={machine.id}
+                    className="flex items-center justify-between p-4 border rounded-lg hover:bg-accent/30 transition-colors"
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className="w-10 h-10 rounded-lg bg-secondary/10 flex items-center justify-center">
+                        <Building2 className="w-5 h-5 text-secondary" />
                       </div>
-                      <div className="text-sm text-muted-foreground font-mono">
-                        {machine.id}
+                      <div>
+                        <div className="font-semibold text-foreground flex items-center gap-2">
+                          {machine.lokasi}
+                          <Badge 
+                            variant={machine.koneksi === "online" ? "default" : "destructive"}
+                            className="text-xs"
+                          >
+                            {machine.koneksi === "online" ? "Aktif" : "Offline"}
+                          </Badge>
+                        </div>
+                        <div className="text-sm text-muted-foreground font-mono">
+                          {machine.kode_mitra}
+                        </div>
                       </div>
                     </div>
+                    <Button variant="ghost" size="sm" asChild>
+                      <Link to={`/mitra/machine/${machine.kode_mitra}`}>
+                        Detail
+                      </Link>
+                    </Button>
                   </div>
-                  <Button variant="ghost" size="sm">
-                    Detail
-                  </Button>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </CardContent>
         </Card>

@@ -10,10 +10,12 @@ export interface UserData {
   nama: string;
   email: string;
   no_hp: string | null;
+  alamat: string | null;
   
   // User stats
   saldo_coin: number;
   total_botol: number;
+  komisi_mitra: number;
   
   // Role
   role: 'teman' | 'mitra' | null;
@@ -42,7 +44,7 @@ export function useUserData() {
         // Fetch profile data
         const { data: profileData, error: profileError } = await supabase
           .from('profiles')
-          .select('nama, email, no_hp')
+          .select('nama, email, no_hp, alamat')
           .eq('id', user.id)
           .single();
 
@@ -51,7 +53,7 @@ export function useUserData() {
         // Fetch user stats
         const { data: userData, error: userError } = await supabase
           .from('users')
-          .select('saldo_coin, total_botol')
+          .select('saldo_coin, total_botol, komisi_mitra')
           .eq('id', user.id)
           .single();
 
@@ -95,7 +97,7 @@ export function useUserData() {
       // Fetch profile data
       const { data: profileData, error: profileError } = await supabase
         .from('profiles')
-        .select('nama, email, no_hp')
+        .select('nama, email, no_hp, alamat')
         .eq('id', user.id)
         .single();
 
@@ -104,7 +106,7 @@ export function useUserData() {
       // Fetch user stats
       const { data: userData, error: userError } = await supabase
         .from('users')
-        .select('saldo_coin, total_botol')
+        .select('saldo_coin, total_botol, komisi_mitra')
         .eq('id', user.id)
         .single();
 

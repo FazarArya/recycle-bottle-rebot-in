@@ -7,12 +7,15 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useUserData } from "@/hooks/useUserData";
 import { useAuth } from "@/hooks/useAuth";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 const MitraDashboard = () => {
   const { userData, loading: dataLoading } = useUserData();
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
+  const [machines, setMachines] = useState<any[]>([]);
+  const [loadingMachines, setLoadingMachines] = useState(true);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -20,7 +23,38 @@ const MitraDashboard = () => {
     }
   }, [user, authLoading, navigate]);
 
-  if (authLoading || dataLoading || !userData) {
+  useEffect(() => {
+    const fetchMachines = async () => {
+      if (!user) return;
+      
+      try {
+        const { data, error } = await supabase
+          .from('machines')
+          .select('*');
+        
+        if (error) throw error;
+        
+        // Sort machines: user's machines first, then others
+        const sorted = (data || []).sort((a, b) => {
+          const aIsOwned = a.mitra_id === user.id;
+          const bIsOwned = b.mitra_id === user.id;
+          if (aIsOwned && !bIsOwned) return -1;
+          if (!aIsOwned && bIsOwned) return 1;
+          return 0;
+        });
+        
+        setMachines(sorted);
+      } catch (error) {
+        console.error('Error fetching machines:', error);
+      } finally {
+        setLoadingMachines(false);
+      }
+    };
+
+    fetchMachines();
+  }, [user]);
+
+  if (authLoading || dataLoading || loadingMachines || !userData) {
     return (
       <div className="min-h-screen bg-background">
         <Navbar />
@@ -34,66 +68,36 @@ const MitraDashboard = () => {
     );
   }
 
-  // Mock machine data - will be replaced with real data later
+  const userMachines = machines.filter(m => m.mitra_id === user?.id);
   const mitraStats = {
-    totalMachines: 5,
-    activeMachines: 4,
-    totalBottles: 1250,
-    totalWeight: 125,
-    commission: Math.floor(userData.saldo_coin * 0.1) // 10% commission
+    totalMachines: userMachines.length,
+    activeMachines: userMachines.filter(m => m.koneksi === 'online').length,
+    totalBottles: userData.total_botol,
+    totalWeight: Math.floor(userData.total_botol * 0.1), // Assume 100g per bottle
+    commission: userData.komisi_mitra
   };
 
-  const machines = [
-    {
-      id: "RVM-001",
-      name: "T-Mart Sudirman",
-      status: "Aktif",
-      fill: 75,
-      location: "Jl. Sudirman No. 45",
-      bottlesToday: 45
-    },
-    {
-      id: "RVM-002",
-      name: "T-Mart Gatot Subroto",
-      status: "Aktif",
-      fill: 60,
-      location: "Jl. Gatot Subroto No. 12",
-      bottlesToday: 38
-    },
-    {
-      id: "RVM-003",
-      name: "T-Mart Thamrin",
-      status: "Aktif",
-      fill: 85,
-      location: "Jl. Thamrin No. 8",
-      bottlesToday: 52
-    },
-    {
-      id: "RVM-004",
-      name: "T-Mart Kuningan",
-      status: "Aktif",
-      fill: 40,
-      location: "Jl. Kuningan No. 23",
-      bottlesToday: 28
-    },
-    {
-      id: "RVM-005",
-      name: "T-Mart Senayan",
-      status: "Maintenance",
-      fill: 95,
-      location: "Jl. Senayan No. 67",
-      bottlesToday: 0
-    }
-  ];
-
-  const getStatusColor = (status: string) => {
-    return status === "Aktif" ? "bg-primary" : "bg-destructive";
+  const getStatusText = (koneksi: string) => {
+    return koneksi === 'online' ? 'Aktif' : 'Offline';
   };
 
-  const getFillColor = (fill: number) => {
-    if (fill >= 80) return "text-destructive";
-    if (fill >= 60) return "text-yellow-600";
+  const getStatusColor = (koneksi: string) => {
+    return koneksi === "online" ? "bg-primary" : "bg-destructive";
+  };
+
+  const getCapacityColor = (capacity: string) => {
+    if (capacity === 'penuh') return "text-destructive";
+    if (capacity === 'hampir_penuh') return "text-yellow-600";
     return "text-primary";
+  };
+
+  const getCapacityPercentage = (capacity: string) => {
+    switch(capacity) {
+      case 'penuh': return 95;
+      case 'hampir_penuh': return 75;
+      case 'normal': return 40;
+      default: return 20;
+    }
   };
 
   return (
@@ -232,52 +236,57 @@ const MitraDashboard = () => {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {machines.map((machine) => (
-                <Card key={machine.id} className="border">
-                  <CardContent className="p-4">
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="flex items-start gap-4 flex-1">
-                        <div className="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center flex-shrink-0">
-                          <Building2 className="w-6 h-6 text-secondary" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-1">
-                            <h4 className="font-semibold text-foreground">{machine.name}</h4>
-                            <Badge className={getStatusColor(machine.status)}>
-                              {machine.status}
-                            </Badge>
+              {machines.length === 0 ? (
+                <p className="text-center text-muted-foreground py-8">Belum ada mesin RVM</p>
+              ) : (
+                machines.map((machine) => {
+                  const isOwned = machine.mitra_id === user?.id;
+                  return (
+                    <Card key={machine.id} className={`border ${isOwned ? 'border-primary/50 bg-primary/5' : ''}`}>
+                      <CardContent className="p-4">
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="flex items-start gap-4 flex-1">
+                            <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${isOwned ? 'bg-primary/20' : 'bg-secondary/10'}`}>
+                              <Building2 className={`w-6 h-6 ${isOwned ? 'text-primary' : 'text-secondary'}`} />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2 mb-1">
+                                <h4 className="font-semibold text-foreground">{machine.lokasi}</h4>
+                                <Badge className={getStatusColor(machine.koneksi)}>
+                                  {getStatusText(machine.koneksi)}
+                                </Badge>
+                                {isOwned && <Badge variant="outline" className="border-primary text-primary">Milik Anda</Badge>}
+                              </div>
+                              <p className="text-sm text-muted-foreground flex items-center gap-1 mb-2">
+                                <MapPin className="w-3 h-3" />
+                                {machine.lokasi}
+                              </p>
+                              <div className="flex items-center gap-4 text-sm">
+                                <span className="text-muted-foreground">
+                                  Kode: <span className="font-mono font-semibold">{machine.kode_mitra}</span>
+                                </span>
+                              </div>
+                            </div>
                           </div>
-                          <p className="text-sm text-muted-foreground flex items-center gap-1 mb-2">
-                            <MapPin className="w-3 h-3" />
-                            {machine.location}
-                          </p>
-                          <div className="flex items-center gap-4 text-sm">
-                            <span className="text-muted-foreground">
-                              ID: <span className="font-mono">{machine.id}</span>
-                            </span>
-                            <span className="text-muted-foreground">
-                              Hari ini: <span className="font-semibold text-foreground">{machine.bottlesToday} botol</span>
-                            </span>
+                          <div className="flex flex-col items-end gap-2">
+                            <div className="text-right">
+                              <div className={`text-2xl font-bold ${getCapacityColor(machine.status_kapasitas)}`}>
+                                {getCapacityPercentage(machine.status_kapasitas)}%
+                              </div>
+                              <div className="text-xs text-muted-foreground">Kapasitas</div>
+                            </div>
+                            <Button asChild variant="outline" size="sm">
+                              <Link to={`/mitra/machine/${machine.kode_mitra}`}>
+                                Detail
+                              </Link>
+                            </Button>
                           </div>
                         </div>
-                      </div>
-                      <div className="flex flex-col items-end gap-2">
-                        <div className="text-right">
-                          <div className={`text-2xl font-bold ${getFillColor(machine.fill)}`}>
-                            {machine.fill}%
-                          </div>
-                          <div className="text-xs text-muted-foreground">Kapasitas</div>
-                        </div>
-                        <Button asChild variant="outline" size="sm">
-                          <Link to={`/mitra/machine/${machine.id}`}>
-                            Detail
-                          </Link>
-                        </Button>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+                      </CardContent>
+                    </Card>
+                  );
+                })
+              )}
             </div>
           </CardContent>
         </Card>
