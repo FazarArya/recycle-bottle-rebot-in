@@ -1,8 +1,9 @@
 import { Button } from "@/components/ui/button";
-import { Leaf, LogOut } from "lucide-react";
+import { LogOut } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import logoAuthImage from '@/assets/Logo Botol Auth.png';
 
 const Navbar = () => {
   const { user, signOut } = useAuth();
@@ -22,13 +23,15 @@ const Navbar = () => {
     <nav className="fixed top-0 w-full bg-background/95 backdrop-blur-sm border-b border-border z-50">
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate('/')}>
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
-              <Leaf className="w-6 h-6 text-primary-foreground" />
-            </div>
+          <div className="flex items-center cursor-pointer" onClick={() => navigate('/')}>
+            <img 
+              src={logoAuthImage} 
+              alt="REBOT.IN Auth Logo" 
+              className="w-12 h-12 object-contain"
+            />
             <div>
-              <h1 className="text-2xl font-bold text-foreground">REBOT.IN</h1>
-              <p className="text-xs text-muted-foreground">Recycle Botol Indonesia</p>
+              <h1 className="text-2xl font-bold text-foreground font-poppins brand-text">Rebot.in</h1>
+              <p className="text-xs text-muted-foreground font-sans">Recycle Botol Indonesia</p>
             </div>
           </div>
           

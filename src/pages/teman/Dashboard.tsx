@@ -74,7 +74,7 @@ const TemanDashboard = () => {
             <div className="flex items-center justify-between">
               <div className="flex-1">
                 <h3 className="text-xl font-bold mb-1">Scan Botol Sekarang</h3>
-                <p className="text-sm opacity-90">Tukar botol plastik menjadi GreenCoin</p>
+                <p className="text-sm opacity-90">Tukar botol plastik menjadi GreenCoin dengan menghubungkan mesin RVM</p>
               </div>
               <Button 
                 size="lg" 

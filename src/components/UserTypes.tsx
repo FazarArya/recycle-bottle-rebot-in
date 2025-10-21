@@ -8,10 +8,10 @@ const UserTypes = () => {
     <section className="py-24 px-4 bg-card">
       <div className="container mx-auto">
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4 font-poppins">
             Pilih Peran Anda
           </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto font-sans">
             Bergabunglah sebagai Teman atau Mitra REBOT.IN dan mulai berkontribusi 
             untuk lingkungan yang lebih hijau
           </p>
@@ -23,8 +23,8 @@ const UserTypes = () => {
               <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center mb-4">
                 <Users className="w-8 h-8 text-primary-foreground" />
               </div>
-              <CardTitle className="text-2xl">Teman Rebot.in</CardTitle>
-              <CardDescription className="text-base">
+              <CardTitle className="text-2xl font-poppins">Teman Rebot.in</CardTitle>
+              <CardDescription className="text-base font-sans">
                 Untuk individu yang ingin menukar botol menjadi GreenCoin
               </CardDescription>
             </CardHeader>
@@ -35,8 +35,8 @@ const UserTypes = () => {
                     <Recycle className="w-4 h-4 text-secondary" />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-foreground">Tukar Botol</h4>
-                    <p className="text-sm text-muted-foreground">Masukkan botol di mesin RVM dan dapatkan GreenCoin</p>
+                    <h4 className="font-semibold text-foreground font-poppins">Tukar Botol</h4>
+                    <p className="text-sm text-muted-foreground font-sans">Masukkan botol di mesin RVM dan dapatkan GreenCoin</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
@@ -44,8 +44,8 @@ const UserTypes = () => {
                     <Coins className="w-4 h-4 text-secondary" />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-foreground">Cairkan Koin</h4>
-                    <p className="text-sm text-muted-foreground">Tukar GreenCoin menjadi uang melalui T-Mart</p>
+                    <h4 className="font-semibold text-foreground font-poppins">Cairkan Koin</h4>
+                    <p className="text-sm text-muted-foreground font-sans">Tukar GreenCoin menjadi uang melalui T-Mart</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
@@ -53,8 +53,8 @@ const UserTypes = () => {
                     <LineChart className="w-4 h-4 text-secondary" />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-foreground">Jejak Hijau</h4>
-                    <p className="text-sm text-muted-foreground">Pantau kontribusi Anda untuk lingkungan</p>
+                    <h4 className="font-semibold text-foreground font-poppins">Jejak Hijau</h4>
+                    <p className="text-sm text-muted-foreground font-sans">Pantau kontribusi Anda untuk lingkungan</p>
                   </div>
                 </div>
               </div>
@@ -71,8 +71,8 @@ const UserTypes = () => {
               <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-secondary to-primary flex items-center justify-center mb-4">
                 <Building2 className="w-8 h-8 text-primary-foreground" />
               </div>
-              <CardTitle className="text-2xl">Mitra Rebot.in</CardTitle>
-              <CardDescription className="text-base">
+              <CardTitle className="text-2xl font-poppins">Mitra Rebot.in</CardTitle>
+              <CardDescription className="text-base font-sans">
                 Untuk pengelola mesin RVM yang ingin mendapatkan komisi
               </CardDescription>
             </CardHeader>
@@ -83,8 +83,8 @@ const UserTypes = () => {
                     <MapPin className="w-4 h-4 text-secondary" />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-foreground">Kelola Mesin</h4>
-                    <p className="text-sm text-muted-foreground">Monitor status, isi, dan lokasi mesin RVM</p>
+                    <h4 className="font-semibold text-foreground font-poppins">Kelola Mesin</h4>
+                    <p className="text-sm text-muted-foreground font-sans">Monitor status, isi, dan lokasi mesin RVM</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
@@ -92,8 +92,8 @@ const UserTypes = () => {
                     <Coins className="w-4 h-4 text-secondary" />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-foreground">Komisi GreenCoin</h4>
-                    <p className="text-sm text-muted-foreground">Dapatkan komisi dari setiap transaksi</p>
+                    <h4 className="font-semibold text-foreground font-poppins">Komisi GreenCoin</h4>
+                    <p className="text-sm text-muted-foreground font-sans">Dapatkan komisi dari setiap transaksi</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
@@ -101,8 +101,8 @@ const UserTypes = () => {
                     <LineChart className="w-4 h-4 text-secondary" />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-foreground">Statistik Detail</h4>
-                    <p className="text-sm text-muted-foreground">Lihat data botol dan berat yang terkumpul</p>
+                    <h4 className="font-semibold text-foreground font-poppins">Statistik Detail</h4>
+                    <p className="text-sm text-muted-foreground font-sans">Lihat data botol dan berat yang terkumpul</p>
                   </div>
                 </div>
               </div>

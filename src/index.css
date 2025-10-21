@@ -82,7 +82,18 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans;
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+
+  /* Headings menggunakan Poppins */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Poppins', system-ui, sans-serif;
+  }
+
+  /* Brand/Logo text menggunakan Poppins */
+  .brand-text {
+    font-family: 'Poppins', system-ui, sans-serif;
   }
 }
 

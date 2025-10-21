@@ -8,8 +8,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 import { z } from 'zod';
-import { Leaf } from 'lucide-react';
+import { Eye, EyeOff } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import logoAuthImage from '@/assets/Logo Botol Auth.png';
 
 const loginSchema = z.object({
   email: z.string().trim().email({ message: 'Email tidak valid' }),
@@ -34,6 +35,9 @@ export default function TemanAuth() {
   const [showOTPVerification, setShowOTPVerification] = useState(false);
   const [pendingEmail, setPendingEmail] = useState('');
   const [pendingNama, setPendingNama] = useState('');
+  const [showLoginPassword, setShowLoginPassword] = useState(false);
+  const [showSignupPassword, setShowSignupPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   // Redirect if already logged in
   useEffect(() => {
@@ -176,12 +180,14 @@ export default function TemanAuth() {
         <Card className="w-full max-w-md">
           <CardHeader className="space-y-1 text-center">
             <div className="flex justify-center mb-4">
-              <div className="bg-primary/10 p-3 rounded-full">
-                <Leaf className="h-8 w-8 text-primary" />
-              </div>
+              <img 
+                src={logoAuthImage} 
+                alt="REBOT.IN Auth Logo" 
+                className="w-16 h-16 object-contain"
+              />
             </div>
-            <CardTitle className="text-2xl font-bold">Verifikasi Email</CardTitle>
-            <CardDescription>Masukkan kode OTP yang telah dikirim ke {pendingEmail}</CardDescription>
+            <CardTitle className="text-2xl font-bold font-poppins">Verifikasi Email</CardTitle>
+            <CardDescription className="font-sans">Masukkan kode OTP yang telah dikirim ke {pendingEmail}</CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleVerifyOTP} className="space-y-4">
@@ -220,12 +226,14 @@ export default function TemanAuth() {
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1 text-center">
           <div className="flex justify-center mb-4">
-            <div className="bg-primary/10 p-3 rounded-full">
-              <Leaf className="h-8 w-8 text-primary" />
-            </div>
+            <img 
+              src={logoAuthImage} 
+              alt="REBOT.IN Auth Logo" 
+              className="w-16 h-16 object-contain"
+            />
           </div>
-          <CardTitle className="text-2xl font-bold">Teman Rebot.in</CardTitle>
-          <CardDescription>Masuk atau daftar untuk mulai menukar botol</CardDescription>
+            <CardTitle className="text-2xl font-bold font-poppins">Teman Rebot.in</CardTitle>
+            <CardDescription className="font-sans">Masuk atau daftar untuk mulai menukar botol</CardDescription>
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="login" className="w-full">
@@ -248,13 +256,28 @@ export default function TemanAuth() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="login-password">Password</Label>
-                  <Input
-                    id="login-password"
-                    name="password"
-                    type="password"
-                    placeholder="••••••••"
-                    required
-                  />
+                  <div className="relative">
+                    <Input
+                      id="login-password"
+                      name="password"
+                      type={showLoginPassword ? "text" : "password"}
+                      placeholder="••••••••"
+                      required
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8"
+                      onClick={() => setShowLoginPassword(!showLoginPassword)}
+                    >
+                      {showLoginPassword ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
+                    </Button>
+                  </div>
                 </div>
                 <Button type="submit" className="w-full" disabled={loading}>
                   {loading ? 'Memproses...' : 'Masuk'}
@@ -270,7 +293,7 @@ export default function TemanAuth() {
                     id="signup-nama"
                     name="nama"
                     type="text"
-                    placeholder="John Doe"
+                    placeholder="Masukkan nama lengkap Anda"
                     required
                   />
                 </div>
@@ -280,7 +303,7 @@ export default function TemanAuth() {
                     id="signup-email"
                     name="email"
                     type="email"
-                    placeholder="nama@email.com"
+                    placeholder="Masukkan email Anda"
                     required
                   />
                 </div>
@@ -290,29 +313,59 @@ export default function TemanAuth() {
                     id="signup-no_hp"
                     name="no_hp"
                     type="tel"
-                    placeholder="08123456789"
+                    placeholder="Masukkan nomor HP Anda"
                     required
                   />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="signup-password">Password</Label>
-                  <Input
-                    id="signup-password"
-                    name="password"
-                    type="password"
-                    placeholder="••••••••"
-                    required
-                  />
+                  <div className="relative">
+                    <Input
+                      id="signup-password"
+                      name="password"
+                      type={showSignupPassword ? "text" : "password"}
+                      placeholder="••••••••"
+                      required
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8"
+                      onClick={() => setShowSignupPassword(!showSignupPassword)}
+                    >
+                      {showSignupPassword ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
+                    </Button>
+                  </div>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="signup-confirm">Konfirmasi Password</Label>
-                  <Input
-                    id="signup-confirm"
-                    name="confirmPassword"
-                    type="password"
-                    placeholder="••••••••"
-                    required
-                  />
+                  <div className="relative">
+                    <Input
+                      id="signup-confirm"
+                      name="confirmPassword"
+                      type={showConfirmPassword ? "text" : "password"}
+                      placeholder="••••••••"
+                      required
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    >
+                      {showConfirmPassword ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
+                    </Button>
+                  </div>
                 </div>
                 <Button type="submit" className="w-full" disabled={loading}>
                   {loading ? 'Memproses...' : 'Daftar'}

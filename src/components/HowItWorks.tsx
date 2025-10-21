@@ -7,17 +7,17 @@ const HowItWorks = () => {
     <section className="py-24 px-4">
       <div className="container mx-auto">
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4 font-poppins">
             Cara Kerja
           </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto font-sans">
             Proses mudah dan cepat untuk mulai berkontribusi dalam daur ulang
           </p>
         </div>
 
         <div className="grid lg:grid-cols-2 gap-12 items-center mb-20">
           <div className="order-2 lg:order-1">
-            <h3 className="text-2xl font-bold text-foreground mb-8">Untuk Teman Rebot.in</h3>
+            <h3 className="text-2xl font-bold text-foreground mb-8 font-poppins">Untuk Teman Rebot.in</h3>
             <div className="space-y-6">
               {[
                 {
@@ -61,8 +61,8 @@ const HowItWorks = () => {
                     </div>
                   </div>
                   <div>
-                    <h4 className="font-semibold text-foreground mb-1">{item.title}</h4>
-                    <p className="text-sm text-muted-foreground">{item.description}</p>
+                    <h4 className="font-semibold text-foreground mb-1 font-poppins">{item.title}</h4>
+                    <p className="text-sm text-muted-foreground font-sans">{item.description}</p>
                   </div>
                 </div>
               ))}
@@ -79,7 +79,7 @@ const HowItWorks = () => {
         </div>
 
         <div className="bg-gradient-to-br from-secondary/10 to-primary/10 rounded-3xl p-8 md:p-12">
-          <h3 className="text-2xl font-bold text-foreground mb-8">Untuk Mitra Rebot.in</h3>
+          <h3 className="text-2xl font-bold text-foreground mb-8 font-poppins">Untuk Mitra Rebot.in</h3>
           <div className="grid md:grid-cols-3 gap-6">
             {[
               {
@@ -102,8 +102,8 @@ const HowItWorks = () => {
                 <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center mb-4">
                   <item.icon className="w-6 h-6 text-primary-foreground" />
                 </div>
-                <h4 className="font-semibold text-foreground mb-2">{item.title}</h4>
-                <p className="text-sm text-muted-foreground">{item.description}</p>
+                <h4 className="font-semibold text-foreground mb-2 font-poppins">{item.title}</h4>
+                <p className="text-sm text-muted-foreground font-sans">{item.description}</p>
               </Card>
             ))}
           </div>
