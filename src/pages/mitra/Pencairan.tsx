@@ -25,7 +25,7 @@ const MitraPencairan = () => {
   const [transactionStatus, setTransactionStatus] = useState<'pending' | 'success' | 'failed' | null>(null);
   
   const currentBalance = Math.floor((userData?.saldo_coin || 0) * 0.1); // 10% commission for mitra
-  const minWithdrawal = 50; // Minimal 50 coin = Rp 500
+  const minWithdrawal = 500; // Minimal 500 coin = Rp 5000
   const conversionRate = 10; // 1 GC = Rp 10
   const serviceFee = 0; // Tidak ada biaya layanan
 
