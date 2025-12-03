@@ -1,6 +1,6 @@
 import { Card } from "@/components/ui/card";
 import { UserCheck, Smartphone, Recycle, Coins, DollarSign, BarChart3 } from "lucide-react";
-import rvmImage from "@/assets/rvm-machine.jpg";
+import rvmImage from "@/assets/rvm-machine1.png";
 
 const HowItWorks = () => {
   return (
